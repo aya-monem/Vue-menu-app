@@ -1,4 +1,5 @@
 import { reactive, computed } from 'vue';
+import categoriesData from '@/data/categories.json';
 
 const store = reactive({
   categories: [],
@@ -80,23 +81,29 @@ const store = reactive({
       existingItem.quantity = item.quantity
     }
   },
-
-  async fetchCategories() {
-    const response = await fetch('http://localhost:3000/categories');
-    try{
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      store.categories = await response.json();
-      store.categories.map((category) => {
-          category.isOpen = false;
-      });
-      store.categories[0].isOpen = true;
-    }
-    catch(err){
-      console.log(err);
-    }
-  }
+  fetchCategories() {
+    store.categories = categoriesData.categories;
+    store.categories.map((category) => {
+      category.isOpen = false;
+  });
+  store.categories[0].isOpen = true;
+  },
+  // async fetchCategories() {
+  //   const response = await fetch('http://localhost:3000/categories');
+  //   try{
+  //     if (!response.ok) {
+  //         throw new Error('Network response was not ok');
+  //     }
+  //     store.categories = await response.json();
+  //     store.categories.map((category) => {
+  //         category.isOpen = false;
+  //     });
+  //     store.categories[0].isOpen = true;
+  //   }
+  //   catch(err){
+  //     console.log(err);
+  //   }
+  // }
 });
 
 export function useStore() {
