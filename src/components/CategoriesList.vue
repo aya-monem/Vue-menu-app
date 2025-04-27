@@ -8,14 +8,14 @@ const store = useStore();
 <template>
     <div class="categories">
         <div v-for="category in store.filteredCategories" class="category-accordion" :key="category.id">
-            <div class="category-name" @click="category.isOpen = !category.isOpen">
+            <div class="category-name" @click="store.toggleIsOpenCategory(category.id)">
                 <h2>{{ category.name }}</h2>
                 <svg class="arrow" :class="{ 'arrow-up': category.isOpen, 'arrow-down': !category.isOpen }" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
                     <path d="M7 10l5 5 5-5z" />
                 </svg>
                 <!-- <span class="arrow" :class="{ 'arrow-up': category.isOpen, 'arrow-down': !category.isOpen }">&#9660;</span> -->
             </div>
-            <CategoryItems :category="category" v-if="category.isOpen"/>
+            <CategoryItems :category="category" v-show="category.isOpen"/>
         </div>
     </div>
 </template>

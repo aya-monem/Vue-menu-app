@@ -14,8 +14,8 @@
             <p>{{ item.description }}</p>
             <p class="item-price">$ {{ item.price }}</p>
             <p>Quantity</p>
-            <select v-model="item.quantity" class="input-field">
-                <option v-for="q in 10" :key="q">{{ q }}</option>
+            <select v-model="item.quantity" class="input-field" @change="store.updateSelectedItems(item)">
+                <option v-for="q in 10" :key="q" :value="q">{{ q }}</option>
             </select>
             <!-- <select v-else disabled class="input-field">
                 <option >1</option>
@@ -27,7 +27,7 @@
 import { useStore } from "../store";
 const store = useStore();
 const { item } = defineProps(['item']);
-item.quantity = 1
+// item.quantity = item.quantity || 1
 // if (!item.selected) {
 //     item.selected = false;
 //     item.quantity = 0;
@@ -82,5 +82,16 @@ item.quantity = 1
 }
 .input-field:disabled{
     padding: 5px 15px; 
+}
+@media (max-width: 480px) {
+    .category-item {
+        max-height: 400px; 
+    }
+    .item-image {
+        height: 50%; 
+    }
+    .input-field, .input-field:disabled {
+        font-size: 14px;
+    }
 }
 </style>

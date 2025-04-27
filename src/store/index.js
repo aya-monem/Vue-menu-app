@@ -12,10 +12,12 @@ const store = reactive({
   }),
   
   filteredCategories: computed(() => {
-    let allCategories = JSON.parse(JSON.stringify(store.categories));
+    let allCategories = store.categories;//JSON.parse(JSON.stringify(store.categories));
 
     if(store.searchValue == '' && store.selectedOption == 'all'){
-      allCategories = store.categories;
+      // allCategories = store.categories;
+      allCategories = allCategories;
+      allCategories[0].isOpen = true;
     }
     if (store.selectedOption !== 'all') {
       allCategories = allCategories.filter(category => category.name === store.selectedOption);
@@ -23,13 +25,15 @@ const store = reactive({
     }
     if (store.searchValue) {
       const query = store.searchValue.toLowerCase();
-      allCategories.forEach((category) => {
-        category.items = category.items.filter(item => item.title.toLowerCase().includes(query));
-        category.isOpen = true;
-        return category;
-      });
+      allCategories = allCategories.map((category) => {
+        let filteredItems = category.items.filter(item => item.title.toLowerCase().includes(query));
+        return {
+          ...category,
+          items: filteredItems,
+          isOpen: true
+        };
+      }).filter(category => category.items.length > 0)
     }
-    
     return allCategories;
   }),
   // updateSelectedItems(item){
@@ -47,31 +51,17 @@ const store = reactive({
   //   }
     
   // },
-  searchResults: computed(() => {
-    if (store.searchValue) {
-      const query = store.searchValue.toLowerCase();
-      store.categories.map((category) => {
-        // console.log(category.items)
-        category.items = category.items.filter(item => item.title.toLowerCase().includes(query));
-        category.isOpen = true;
-      });
-      return store.categories.filter(category => category.name.toLowerCase().includes(query));
-    }
-    else return store.categories;
-  }),
 
   updateSelectedItems(item){
-    if(item.selected){
-      // item.quantity = 1;
-      store.selectedMenuItems.push(item)
-    }
-    else{
-      const index = store.selectedMenuItems.findIndex(menuItem => menuItem.id === item.id);
-      if (index !== -1) {
-        store.selectedMenuItems.splice(index, 1); 
+    const index = store.selectedMenuItems.findIndex(menuItem => menuItem.id === item.id);
+      if(item.selected){
+        if(index !== -1) store.selectedMenuItems[index].quantity = item.quantity;
+        else store.selectedMenuItems.push(item)
       }
-      // item.quantity = 0;
-      // store.selectedMenuItems = store.selectedMenuItems.filter(menuItem => menuItem.id != item.id)
+      else{
+        const index = store.selectedMenuItems.findIndex(menuItem => menuItem.id === item.id);
+        if(index !== -1) store.selectedMenuItems.splice(index, 1); 
+        // store.selectedMenuItems = store.selectedMenuItems.filter(menuItem => menuItem.id != item.id)
     }
   },
 
@@ -81,11 +71,26 @@ const store = reactive({
       existingItem.quantity = item.quantity
     }
   },
+
+  toggleIsOpenCategory(catId){
+    const category = store.categories.find(category => category.id === catId);
+    if(category){
+      category.isOpen = !category.isOpen;
+    }
+  },
   fetchCategories() {
-    store.categories = categoriesData.categories;
-    store.categories.map((category) => {
-      category.isOpen = false;
-  });
+    let categories = categoriesData.categories;
+    // store.categories = categoriesData.categories;
+  store.categories = categories.map(category => ({
+    ...category,
+    isOpen: false,
+    items: category.items.map(item => ({
+      ...item,
+      selected: false,
+      quantity: 1
+    }))
+  }));
+
   store.categories[0].isOpen = true;
   },
   // async fetchCategories() {
